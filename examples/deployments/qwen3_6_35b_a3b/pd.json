@@ -1,0 +1,24 @@
+{
+  "dtype": "bf16",
+  "kv_cache_dtype": "bf16",
+  "ep": true,
+  "block_size": 16,
+  "gpu_memory_gib": 80,
+  "gpu_memory_utilization": 0.9,
+  "runtime_overhead_gib": 2.0,
+  "prefill": {
+    "tp": 4,
+    "dp": 1,
+    "max_model_len": 262144,
+    "max_num_seqs": 1,
+    "max_num_batched_tokens": 131072,
+    "activation_peak_gib": 6.0
+  },
+  "decode": {
+    "tp": 4,
+    "dp": 8,
+    "max_model_len": 262144,
+    "max_num_seqs": 8,
+    "activation_peak_gib": 1.5
+  }
+}

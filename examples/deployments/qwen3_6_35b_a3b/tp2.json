@@ -1,0 +1,14 @@
+{
+  "tp": 2,
+  "dp": 1,
+  "pp": 1,
+  "ep": true,
+  "dtype": "bf16",
+  "kv_cache_dtype": "bf16",
+  "max_model_len": 262144,
+  "max_num_seqs": 16,
+  "block_size": 16,
+  "gpu_memory_gib": 64,
+  "gpu_memory_utilization": 0.9,
+  "runtime_overhead_gib": 1.5
+}
