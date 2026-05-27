@@ -70,6 +70,8 @@ def print_human(report: Dict[str, Any]) -> None:
                     f"    effective_layer_tokens={children['effective_layer_tokens']} "
                     f"({children['compression_note']})"
                 )
+            if children.get("windowed_layers_local"):
+                print(f"    windowed_layers_local={len(children['windowed_layers_local'])}")
             print(f"    per_1k_tokens={children['gib_per_1k_tokens']:.4f} GiB/GPU")
         elif key == "kv_transfer":
             children = item["children"]

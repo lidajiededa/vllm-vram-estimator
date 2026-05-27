@@ -36,6 +36,10 @@ CASES = [
         ["--deployment", "examples/deployments/openpangu_ultra_moe_718b/tp32.json"],
     ),
     (
+        "pangu_v2_moe/config.json",
+        ["--deployment", "examples/deployments/pangu_v2_moe/tp32.json"],
+    ),
+    (
         "qwen2_7b/config.json",
         ["--tp", "1", "--dtype", "bf16", "--max-model-len", "32768", "--max-num-seqs", "16", "--gpu-memory-gib", "80"],
     ),

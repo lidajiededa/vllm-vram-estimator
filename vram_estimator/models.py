@@ -42,6 +42,9 @@ class ModelShape:
     config_quant_method: Optional[str] = None
     quant_modules_to_not_convert: List[str] = field(default_factory=list)
     compress_ratios: Optional[List[int]] = None
+    dsa_layers: Optional[List[int]] = None
+    swa_layers: Optional[List[int]] = None
+    sliding_window_list: Optional[List[int]] = None
     layer_types: Optional[List[str]] = None
     linear_key_head_dim: Optional[int] = None
     linear_value_head_dim: Optional[int] = None
@@ -157,6 +160,21 @@ class ModelShape:
             compress_ratios=(
                 [int(ratio) for ratio in config["compress_ratios"]]
                 if config.get("compress_ratios") is not None
+                else None
+            ),
+            dsa_layers=(
+                [int(layer) for layer in config["dsa_layers"]]
+                if config.get("dsa_layers") is not None
+                else None
+            ),
+            swa_layers=(
+                [int(layer) for layer in config["swa_layers"]]
+                if config.get("swa_layers") is not None
+                else None
+            ),
+            sliding_window_list=(
+                [int(window) for window in config["sliding_window_list"]]
+                if config.get("sliding_window_list") is not None
                 else None
             ),
             layer_types=list(config.get("layer_types", [])) if config.get("layer_types") is not None else None,

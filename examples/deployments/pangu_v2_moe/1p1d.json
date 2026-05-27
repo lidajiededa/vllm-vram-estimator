@@ -1,0 +1,32 @@
+{
+  "dtype": "bf16",
+  "kv_cache_dtype": "bf16",
+  "ep": true,
+  "pp": 1,
+  "block_size": 16,
+  "gpu_memory_gib": 64,
+  "gpu_memory_utilization": 0.9,
+  "runtime_overhead_gib": 2.0,
+  "kv_transfer": {
+    "enabled": true,
+    "mode": "vllm_buffer",
+    "kv_buffer_size_bytes": 1000000000,
+    "comm_overhead_gib": 0.0
+  },
+  "prefill": {
+    "tp": 32,
+    "dp": 1,
+    "max_model_len": 524288,
+    "max_num_seqs": 1,
+    "max_num_batched_tokens": 524288,
+    "activation_peak_gib": 4.0
+  },
+  "decode": {
+    "tp": 1,
+    "dp": 32,
+    "max_model_len": 524288,
+    "max_num_seqs": 1,
+    "max_num_batched_tokens": 8192,
+    "activation_peak_gib": 1.5
+  }
+}

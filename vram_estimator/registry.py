@@ -33,6 +33,7 @@ MODEL_REGISTRY: Dict[str, ModelEntry] = {
     "deepseek-v4-flash-base": ModelEntry("deepseek-v4-flash-base", "examples/configs/deepseek_v4_flash_base/config.json", "examples/deployments/deepseek_v4_flash_base/tp16.json"),
     "deepseek-v4-pro-base": ModelEntry("deepseek-v4-pro-base", "examples/configs/deepseek_v4_pro_base/config.json", "examples/deployments/deepseek_v4_pro_base/tp64.json"),
     "openpangu-ultra-moe-718b": ModelEntry("openpangu-ultra-moe-718b", "examples/configs/openpangu_ultra_moe_718b/config.json", "examples/deployments/openpangu_ultra_moe_718b/tp32.json", "FreedomIntelligence/openPangu-Ultra-MoE-718B"),
+    "pangu-v2-moe": ModelEntry("pangu-v2-moe", "examples/configs/pangu_v2_moe/config.json", "examples/deployments/pangu_v2_moe/tp32.json"),
 }
 
 

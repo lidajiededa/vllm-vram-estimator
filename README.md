@@ -85,7 +85,7 @@ qwen3.5-397b-a17b-fp8
 qwen3.5-397b-a17b-gptq-int4
 ```
 
-Qwen3.6 / GLM / DeepSeek：
+Qwen3.6 / GLM / DeepSeek / Pangu：
 
 ```text
 qwen3.6-27b
@@ -98,6 +98,7 @@ deepseek-v4-flash-base
 deepseek-v4-pro-base
 deepseek-moe-like
 openpangu-ultra-moe-718b
+pangu-v2-moe
 ```
 
 模型名支持宽松写法，例如 `Qwen/Qwen3.5-35B-A3B`、`qwen3_5_35b_a3b`、`deepseek-ai/DeepSeek-V4-Pro-Base` 都可以解析。
@@ -243,6 +244,14 @@ openPangu Ultra MoE 718B：
 来自 ModelScope `FreedomIntelligence/openPangu-Ultra-MoE-718B`。
 结构是 MoE + MLA/kv_lora compressed KV，按 `kv_lora_rank + qk_rope_head_dim` 估算 KV cache。
 示例默认使用 TP=32、EP=true、BF16、80GiB 卡。
+```
+
+Pangu V2 MoE：
+
+```text
+支持 `pangu-v2-moe`。结构是 MoE + MLA/kv_lora compressed KV，同时包含 DSA full-context 层和 SWA sliding-window 层。
+KV cache 会对 `swa_layers` 按 `sliding_window_list` 截断 token 预算，其余 DSA/普通层按完整 token budget 估算。
+示例默认使用 TP=32、EP=true、BF16、64GiB 卡。
 ```
 
 ## 代码结构

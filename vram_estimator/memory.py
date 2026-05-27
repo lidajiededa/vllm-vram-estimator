@@ -82,6 +82,7 @@ def estimate_kv_cache_bytes(shape: ModelShape, deploy: Deployment) -> Tuple[floa
     token_budget = deploy.max_num_batched_tokens or tokens_by_seqs
     rounded_tokens = ceil_div(token_budget, deploy.block_size) * deploy.block_size
 
+    windowed_layers_local: Dict[int, int] = {}
     if shape.compress_ratios:
         ratios = shape.compress_ratios[:kv_layers_total]
         ratio_layers = ratios[:local_layers]
@@ -89,6 +90,32 @@ def estimate_kv_cache_bytes(shape: ModelShape, deploy: Deployment) -> Tuple[floa
             rounded_tokens if ratio <= 0 else ceil_div(rounded_tokens, max(1, ratio)) for ratio in ratio_layers
         )
         compression_note = "DeepSeek-V4 token-wise compression ratios applied per local layer."
+    elif shape.sliding_window_list and shape.swa_layers:
+        if len(shape.sliding_window_list) == len(shape.swa_layers):
+            window_by_layer = {
+                int(layer): int(window)
+                for layer, window in zip(shape.swa_layers, shape.sliding_window_list)
+                if int(layer) < kv_layers_total
+            }
+        elif len(shape.sliding_window_list) >= kv_layers_total:
+            window_by_layer = {
+                layer: int(shape.sliding_window_list[layer])
+                for layer in range(kv_layers_total)
+                if int(shape.sliding_window_list[layer]) > 0
+            }
+        else:
+            window_by_layer = {}
+        local_layer_indices = list(range(local_layers))
+        effective_tokens = 0
+        for layer_idx in local_layer_indices:
+            window = window_by_layer.get(layer_idx)
+            if window:
+                layer_tokens = min(rounded_tokens, ceil_div(window, deploy.block_size) * deploy.block_size)
+                windowed_layers_local[layer_idx] = layer_tokens
+            else:
+                layer_tokens = rounded_tokens
+            effective_tokens += layer_tokens
+        compression_note = "Sliding-window attention layers cap KV tokens per configured window; other layers use full token budget."
     else:
         effective_tokens = rounded_tokens * local_layers
         compression_note = "No KV token compression configured."
@@ -113,6 +140,7 @@ def estimate_kv_cache_bytes(shape: ModelShape, deploy: Deployment) -> Tuple[floa
         "kv_gib_per_1k_tokens_per_gpu": as_gib(bytes_per_token * 1000),
         "kv_compression_note": compression_note,
         "kv_compress_ratios_local": shape.compress_ratios[:local_layers] if shape.compress_ratios else [],
+        "kv_windowed_layers_local": windowed_layers_local,
         "local_kv_heads": local_kv_heads,
         "local_layers": local_layers,
         "kv_layers_total": kv_layers_total,

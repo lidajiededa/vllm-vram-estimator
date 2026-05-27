@@ -76,6 +76,40 @@ def test_glm_5_1_kv_lora_layout() -> None:
     assert kv["cache_dim_per_token_layer"] == 576
 
 
+def test_pangu_v2_moe_sliding_window_kv() -> None:
+    config_path = ROOT / "examples/configs/pangu_v2_moe/config.json"
+    report = build_report(
+        read_json("examples/configs/pangu_v2_moe/config.json"),
+        Deployment.from_mapping(read_json("examples/deployments/pangu_v2_moe/tp32.json")),
+        config_path,
+    )
+
+    kv = report["per_gpu_breakdown"]["kv_cache"]["children"]
+    assert report["model"]["model_type"] == "pangu_v2_moe"
+    assert report["model"]["moe_layers"] == 47
+    assert round(report["params"]["total"] / 1e9, 3) == 505.488
+    assert kv["cache_layout"] == "compressed_kv_lora"
+    assert kv["cache_dim_per_token_layer"] == 576
+    assert len(kv["windowed_layers_local"]) == 32
+    assert kv["effective_layer_tokens"] < kv["reserved_tokens"] * kv["local_layers"]
+
+
+def test_pangu_v2_moe_pd_1p1d() -> None:
+    config_path = ROOT / "examples/configs/pangu_v2_moe/config.json"
+    report = build_pd_report(
+        read_json("examples/configs/pangu_v2_moe/config.json"),
+        read_json("examples/deployments/pangu_v2_moe/1p1d.json"),
+        config_path,
+    )
+
+    assert report["prefill"]["deployment"]["tp"] == 32
+    assert report["decode"]["deployment"]["tp"] == 1
+    assert report["decode"]["deployment"]["dp"] == 32
+    assert report["decode"]["deployment"]["max_num_batched_tokens"] == 8192
+    assert report["prefill"]["fit"] is True
+    assert report["decode"]["fit"] is True
+
+
 def test_pd_disaggregated_report() -> None:
     config_path = ROOT / "examples/configs/qwen3_6_35b_a3b/config.json"
     report = build_pd_report(
@@ -110,6 +144,7 @@ def test_non_qwen35_registry() -> None:
     assert resolve_model("zai-org/GLM-5.1").config.endswith("glm_5_1/config.json")
     assert resolve_model("glm-5.1-w4a8").config.endswith("glm_5_1_w4a8/config.json")
     assert resolve_model("openpangu-ultra-moe-718b").config.endswith("openpangu_ultra_moe_718b/config.json")
+    assert resolve_model("pangu-v2-moe").config.endswith("pangu_v2_moe/config.json")
 
 
 def test_max_context_capacity() -> None:
@@ -165,6 +200,8 @@ if __name__ == "__main__":
     test_qwen3_vl_configs()
     test_deepseek_v4_flash_compressed_kv()
     test_glm_5_1_kv_lora_layout()
+    test_pangu_v2_moe_sliding_window_kv()
+    test_pangu_v2_moe_pd_1p1d()
     test_pd_disaggregated_report()
     test_qwen35_registry()
     test_non_qwen35_registry()

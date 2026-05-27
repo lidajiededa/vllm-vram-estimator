@@ -63,6 +63,7 @@ def _per_gpu_breakdown(
                 "effective_layer_tokens": kv_meta["kv_effective_layer_tokens_per_gpu"],
                 "compression_note": kv_meta["kv_compression_note"],
                 "compress_ratios_local": kv_meta["kv_compress_ratios_local"],
+                "windowed_layers_local": kv_meta["kv_windowed_layers_local"],
             },
         },
         "activation_peak": {
@@ -134,6 +135,9 @@ def build_report(config: Dict[str, Any], deploy: Deployment, config_path: Path) 
             "num_experts_per_tok": shape.num_experts_per_tok,
             "full_attention_layers": shape.full_attention_layers,
             "linear_attention_layers": shape.linear_attention_layers,
+            "dsa_layers": shape.dsa_layers or [],
+            "swa_layers": shape.swa_layers or [],
+            "sliding_window_list": shape.sliding_window_list or [],
             "decoder_sparse_step": shape.decoder_sparse_step,
             "mlp_only_layers": shape.mlp_only_layers or [],
             "num_nextn_predict_layers": shape.num_nextn_predict_layers,
